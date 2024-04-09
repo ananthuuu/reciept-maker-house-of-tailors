@@ -1,0 +1,64 @@
+{% extends "receipts/base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Receipts List</h2>
+    <div class="text-right mb-3">
+        <a href="{% url 'add_receipt' %}" class="btn btn-secondary">+ New Receipt</a>
+    </div>
+    <!-- Search Form -->
+    <form method="get" class="form-inline justify-content-center mb-4">
+        <input class="form-control mr-sm-2" type="search" placeholder="Search by ID or Name" aria-label="Search" name="q" value="{{ query }}" style="min-width: 200px;">
+        <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Search</button>
+    </form>
+
+    <!-- Receipts Table -->
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="thead-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th class="d-none d-md-table-cell">Contact Number</th>
+                    <th class="d-none d-lg-table-cell">Invoice Number</th>
+                    <th>Amount</th>
+                    <th class="d-none d-md-table-cell">Reference Number</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for receipt in receipts %}
+                <tr>
+                    <td>{{ receipt.id }}</td>
+                    <td>{{ receipt.name }}</td>
+                    <td class="d-none d-md-table-cell">{{ receipt.contact_number }}</td>
+                    <td class="d-none d-lg-table-cell">{{ receipt.invoice_number }}</td>
+                    <td>${{ receipt.amount }}</td>
+                    <td class="d-none d-md-table-cell">{{ receipt.reference_number }}</td>
+                    <td>
+                        <a href="{% url 'generate_pdf' receipt.id %}" class="btn btn-sm btn-outline-info">Generate</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7">No receipts found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination Controls -->
+    <div class="pagination justify-content-center mt-4">
+        {% if receipts.has_previous %}
+        <a class="btn btn-outline-primary mr-2" href="?page=1{% if query %}&q={{ query }}{% endif %}">First</a>
+        <a class="btn btn-outline-primary mr-2" href="?page={{ receipts.previous_page_number }}{% if query %}&q={{ query }}{% endif %}">Previous</a>
+        {% endif %}
+        <span class="current-page d-inline-block my-auto mx-3">Page {{ receipts.number }} of {{ receipts.paginator.num_pages }}</span>
+        {% if receipts.has_next %}
+        <a class="btn btn-outline-primary ml-2" href="?page={{ receipts.next_page_number }}{% if query %}&q={{ query }}{% endif %}">Next</a>
+        <a class="btn btn-outline-primary ml-2" href="?page={{ receipts.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}">Last</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
